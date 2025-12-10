@@ -8,6 +8,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const showAlert = () => {
   Alert.alert("Thanks for subscribing, stay tuned!");
@@ -16,6 +17,7 @@ const showAlert = () => {
 const OnboardingScreen = () => {
   const [invalidSubmit, setInvalidSubmit] = React.useState(true);
   const [email, setEmail] = React.useState("");
+  const navigation = useNavigation();
 
   const checkEmail = (userEmail) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,7 +54,7 @@ const OnboardingScreen = () => {
       <Pressable
         disabled={invalidSubmit}
         style={invalidSubmit ? styles.disabledButton : styles.button}
-        onPress={() => showAlert()}
+        onPress={() => navigation.navigate("Home")}
       >
         <Text style={styles.buttonText}>Next</Text>
       </Pressable>
