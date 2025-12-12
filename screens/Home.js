@@ -9,25 +9,47 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = () => {
   const [invalidSubmit, setInvalidSubmit] = React.useState(true);
   const [email, setEmail] = React.useState("");
   const navigation = useNavigation();
+  const [vB, setVB] = React.useState(false);
 
-  const checkEmail = (userEmail) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmail(userEmail);
-    emailRegex.test(userEmail)
-      ? setInvalidSubmit(false)
-      : setInvalidSubmit(true);
+  React.useEffect(() => {
+    const loadPrefs = async () => {
+      try {
+        const stored = await AsyncStorage.getItem("boardingCompleted");
+        const parsed = stored ? JSON.parse(stored) : false;
+        console.log(parsed);
+        setVB(parsed);
+        console.log(vB);
+      } catch (e) {
+        console.warn("Failed to read onboarding flag:", e);
+      }
+    };
+    loadPrefs();
+  }, []);
+
+  const clearAllData = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      console.warn("Failed to clear storage:", e);
+    }
   };
+
   return (
     <View style={styles.container}>
       <Image
         source={require("../assets/little-lemon-logo-yellow-big.jpg")}
         style={styles.backgroundImage}
       />
+      <Text style={styles.regularText}> here: {String(vB)}</Text>
+      <Pressable style={styles.button} onPress={() => clearAllData()}>
+        <Text style={styles.buttonText}>Delete data</Text>
+      </Pressable>
     </View>
   );
 };

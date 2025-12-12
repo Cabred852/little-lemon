@@ -8,16 +8,35 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
 const showAlert = () => {
   Alert.alert("Thanks for subscribing, stay tuned!");
 };
 
-const OnboardingScreen = () => {
+const OnboardingScreen = ({ navigation }) => {
   const [invalidSubmit, setInvalidSubmit] = React.useState(true);
   const [email, setEmail] = React.useState("");
-  const navigation = useNavigation();
+  const [name, setName] = React.useState("");
+  // const navigation = useNavigation();
+
+  const completeOnboarding = async () => {
+    updateStatePreferences(true);
+    //   navigation.replace("Home");
+  };
+
+  const updateStatePreferences = async (isOnboardingCompleted) => {
+    try {
+      // setStatePreferences((prev) => ({ ...prev, isOnboardingCompleted }));
+      await AsyncStorage.setItem(
+        "boardingCompleted",
+        JSON.stringify(isOnboardingCompleted)
+      );
+    } catch (e) {
+      console.warn("Failed to update onboarding flag:", e);
+    }
+  };
 
   const checkEmail = (userEmail) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +44,10 @@ const OnboardingScreen = () => {
     emailRegex.test(userEmail)
       ? setInvalidSubmit(false)
       : setInvalidSubmit(true);
+  };
+
+  const checkName = (userName) => {
+    setName(userName);
   };
   return (
     <View style={styles.container}>
@@ -37,10 +60,9 @@ const OnboardingScreen = () => {
         <Text style={styles.regularText}>First Name</Text>
         <TextInput
           style={styles.inputBox}
-          keyboardType="email-address"
           placeholder="Type your first name"
-          value={email}
-          onChangeText={checkEmail}
+          value={name}
+          onChangeText={checkName}
         ></TextInput>
         <Text style={styles.regularText}>Email</Text>
         <TextInput
@@ -54,7 +76,7 @@ const OnboardingScreen = () => {
       <Pressable
         disabled={invalidSubmit}
         style={invalidSubmit ? styles.disabledButton : styles.button}
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => completeOnboarding()}
       >
         <Text style={styles.buttonText}>Next</Text>
       </Pressable>
