@@ -11,20 +11,20 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Home = () => {
-  const [boardingCompleted, setBoardingCompleted] = React.useState(false);
-  const [userName, setUserName] = React.useState("");
+const Settings = () => {
+  const [invalidSubmit, setInvalidSubmit] = React.useState(true);
+  const [email, setEmail] = React.useState("");
   const navigation = useNavigation();
+  const [vB, setVB] = React.useState(false);
 
   React.useEffect(() => {
     const loadPrefs = async () => {
       try {
-        const keys = ["onboardingCompleted", "userName"];
-        const stored = await AsyncStorage.multiGet(keys);
-        const data = Object.fromEntries(stored);
-        const parsedName = JSON.parse(data["userName"] ?? "");
-        setBoardingCompleted(JSON.parse(data["onboardingCompleted"]) ?? false);
-        setUserName(parsedName);
+        const stored = await AsyncStorage.getItem("onboardingCompleted");
+        const parsed = stored ? JSON.parse(stored) : false;
+        console.log(parsed);
+        setVB(parsed);
+        console.log(vB);
       } catch (e) {
         console.warn("Failed to read onboarding flag:", e);
       }
@@ -32,18 +32,34 @@ const Home = () => {
     loadPrefs();
   }, []);
 
+  const clearAllData = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      console.warn("Failed to clear storage:", e);
+    }
+  };
+
+  const resetOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem("onboardingCompleted", "false");
+    } catch (e) {
+      console.warn("failed: ", e);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
         source={require("../assets/little-lemon-logo-yellow-big.jpg")}
         style={styles.backgroundImage}
       />
-      <Text>Welcome {userName}!</Text>
-      <Pressable
-        style={styles.button}
-        onPress={() => navigation.navigate("Settings")}
-      >
-        <Text style={styles.buttonText}>Settings</Text>
+      <Text style={styles.regularText}> here: {String(vB)}</Text>
+      <Pressable style={styles.button} onPress={() => clearAllData()}>
+        <Text style={styles.buttonText}>Delete data</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={() => resetOnboarding()}>
+        <Text style={styles.buttonText}>Reset Onboarding</Text>
       </Pressable>
     </View>
   );
@@ -111,4 +127,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Settings;

@@ -19,36 +19,52 @@ const OnboardingScreen = ({ navigation }) => {
   const [invalidSubmit, setInvalidSubmit] = React.useState(true);
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
+  const [errorEmail, setErrorEmail] = React.useState(false);
   // const navigation = useNavigation();
 
   const completeOnboarding = async () => {
     updateStatePreferences(true);
-    //   navigation.replace("Home");
   };
 
   const updateStatePreferences = async (isOnboardingCompleted) => {
     try {
-      // setStatePreferences((prev) => ({ ...prev, isOnboardingCompleted }));
       await AsyncStorage.setItem(
-        "boardingCompleted",
+        "onboardingCompleted",
         JSON.stringify(isOnboardingCompleted)
       );
+      await AsyncStorage.setItem("userName", JSON.stringify(name));
     } catch (e) {
       console.warn("Failed to update onboarding flag:", e);
     }
   };
 
   const checkEmail = (userEmail) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setEmail(userEmail);
-    emailRegex.test(userEmail)
-      ? setInvalidSubmit(false)
-      : setInvalidSubmit(true);
+    // validateFields();
   };
 
   const checkName = (userName) => {
     setName(userName);
+    // validateFields();
   };
+
+  function validateFields() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let emailValidated = false;
+    let nameValidated = false;
+
+    emailRegex.test(email) ? (emailValidated = true) : !emailValidated;
+    name.length > 0 ? (nameValidated = true) : !nameValidated;
+    setErrorEmail(!emailValidated);
+
+    nameValidated && emailValidated
+      ? setInvalidSubmit(false)
+      : setInvalidSubmit(true);
+  }
+  React.useEffect(() => {
+    validateFields();
+  }, [name, email]);
+
   return (
     <View style={styles.container}>
       <Image
@@ -72,6 +88,11 @@ const OnboardingScreen = ({ navigation }) => {
           value={email}
           onChangeText={checkEmail}
         ></TextInput>
+        {errorEmail ? (
+          <Text style={styles.regularText}>Set a valid email address</Text>
+        ) : (
+          <Text></Text>
+        )}
       </View>
       <Pressable
         disabled={invalidSubmit}

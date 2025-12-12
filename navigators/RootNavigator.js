@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import Home from "../screens/Home";
 import Profile from "../screens/Profile";
+import Settings from "../screens/Settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
@@ -15,7 +16,7 @@ const RootNavigator = () => {
   React.useEffect(() => {
     const loadPrefs = async () => {
       try {
-        const stored = await AsyncStorage.getItem("boardingCompleted");
+        const stored = await AsyncStorage.getItem("onboardingCompleted");
         const parsed = stored ? JSON.parse(stored) : false;
         setStatePreferences((prev) => ({
           ...prev,
@@ -31,7 +32,10 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator>
       {statePreferences.isOnboardingCompleted ? (
-        <Stack.Screen name="Home" component={Home} />
+        <>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Settings" component={Settings} />
+        </>
       ) : (
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       )}
