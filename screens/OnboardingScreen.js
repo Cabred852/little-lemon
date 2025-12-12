@@ -32,6 +32,7 @@ const OnboardingScreen = ({ navigation }) => {
         "onboardingCompleted",
         JSON.stringify(isOnboardingCompleted)
       );
+      await AsyncStorage.setItem("userEmail", JSON.stringify(email));
       await AsyncStorage.setItem("userName", JSON.stringify(name));
     } catch (e) {
       console.warn("Failed to update onboarding flag:", e);
@@ -40,12 +41,10 @@ const OnboardingScreen = ({ navigation }) => {
 
   const checkEmail = (userEmail) => {
     setEmail(userEmail);
-    // validateFields();
   };
 
   const checkName = (userName) => {
     setName(userName);
-    // validateFields();
   };
 
   function validateFields() {

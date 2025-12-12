@@ -14,17 +14,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Home = () => {
   const [boardingCompleted, setBoardingCompleted] = React.useState(false);
   const [userName, setUserName] = React.useState("");
+  const [userEmail, setUserEmail] = React.useState("");
   const navigation = useNavigation();
 
   React.useEffect(() => {
     const loadPrefs = async () => {
       try {
-        const keys = ["onboardingCompleted", "userName"];
+        const keys = ["onboardingCompleted", "userName", "userEmail"];
         const stored = await AsyncStorage.multiGet(keys);
         const data = Object.fromEntries(stored);
         const parsedName = JSON.parse(data["userName"] ?? "");
+        const parsedEmail = JSON.parse(data["userEmail"] ?? "N/A");
         setBoardingCompleted(JSON.parse(data["onboardingCompleted"]) ?? false);
         setUserName(parsedName);
+        setUserEmail(parsedEmail);
       } catch (e) {
         console.warn("Failed to read onboarding flag:", e);
       }
@@ -39,6 +42,7 @@ const Home = () => {
         style={styles.backgroundImage}
       />
       <Text>Welcome {userName}!</Text>
+      <Text>Your Email is {userEmail}!</Text>
       <Pressable
         style={styles.button}
         onPress={() => navigation.navigate("Settings")}
